@@ -1,5 +1,6 @@
 #include <getopt.h>
 #include "broker.h"
+#include <pthread.h>
 
 #define REQUESTSDEFAULT 120
 #define MAXQUEUE 12
@@ -9,6 +10,20 @@
 #define CFASTMATCHING 1
 #define PHUMAN 2
 #define PAUTONOMOUS 3
+
+extern "C" void * cThread( void * VoidPtr )
+{
+//    auto *popTree = new populatetree();
+//    popTree->threadMain(VoidPtr); //calls populatetree thread controller
+//    pthread_exit(popTree);
+//    return nullptr;
+    auto* producerController = new producer();
+}
+
+extern "C" void * pThread( void * VoidPtr )
+{
+    auto* consumeController = new consumer();
+}
 
 int main(int argc, char **argv) {
     int temp;
@@ -40,4 +55,13 @@ int main(int argc, char **argv) {
                 break;
         }
     }
+
+    auto* mainBroker = new broker(totalRequests);
+
+    pthread_t cCostSavingThread, cFastMatchingThread, pHumanThread, pAutoThread;
+
+    pthread_create(&pHumanThread, nullptr, &pThread, mainBroker); //create producer thread 1
+    pthread_create(&pAutoThread, nullptr, &pThread, mainBroker); //create producer thread 2
+    pthread_create(&cCostSavingThread, nullptr, &cThread, mainBroker); //create customer thread 1
+    pthread_create(&cFastMatchingThread, nullptr, &cThread, mainBroker); //create customer thread 2
 }

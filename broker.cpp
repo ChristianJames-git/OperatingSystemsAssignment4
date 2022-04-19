@@ -1,5 +1,5 @@
-//
-// Created by socce on 4/19/2022.
-//
-
 #include "broker.h"
+
+broker::broker(unsigned int maxR) {
+    maxRequests = maxR;
+}

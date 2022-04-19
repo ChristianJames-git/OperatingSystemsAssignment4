@@ -9,11 +9,12 @@
 using namespace std;
 
 struct request {
-    
+
 };
 
 class broker {
 public:
+    broker(unsigned int maxR);
     unsigned int maxRequests;
     queue<request> requestQueue;
 };
