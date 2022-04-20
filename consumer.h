@@ -6,7 +6,7 @@
 
 class consumer {
 public:
-    consumer(broker* thisBroker, unsigned int wait, ConsumerType consumerType);
+    explicit consumer(cthread_info* cInfo);
     void begin();
     unsigned int waitTime;
 private:

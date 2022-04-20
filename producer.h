@@ -5,7 +5,7 @@
 
 class producer {
 public:
-    producer(broker* thisBroker, unsigned int wait, RequestType requestType);
+    explicit producer(pthread_info* pInfo);
     void begin();
     unsigned int waitTime;
 private:

@@ -1,9 +1,9 @@
 #include "producer.h"
 
-producer::producer(broker* thisBroker, unsigned int wait, RequestType requestType) {
-    waitTime = wait;
-    sharedBroker = thisBroker;
-    this->requestType = requestType;
+producer::producer(pthread_info* pInfo) {
+    waitTime = pInfo->waitTime;
+    sharedBroker = pInfo->sharedBroker;
+    this->requestType = pInfo->requestType;
     SleepTime.tv_sec = (long)waitTime / MSPERSEC;
     SleepTime.tv_nsec = (long)(waitTime % MSPERSEC) * NSPERMS;
 }
@@ -16,8 +16,6 @@ void producer::begin() {
             sem_wait(&sharedBroker->availableHumanSlots);
         sem_wait(&sharedBroker->availableSlots);
 
-        if (sharedBroker->producedCounter[0] + sharedBroker->producedCounter[1] >= sharedBroker->maxRequests)
-            break;
         errno = 0;
         if (nanosleep(&SleepTime, nullptr) == -1) {
             switch (errno) {
@@ -32,6 +30,8 @@ void producer::begin() {
                     exit(EXIT_FAILURE);
             }
         }
+        if (sharedBroker->producedCounter[0] + sharedBroker->producedCounter[1] >= sharedBroker->maxRequests)
+            break;
         sem_wait(&sharedBroker->mutex);
 
         sharedBroker->requestQueue.push(newRequest);
@@ -40,9 +40,6 @@ void producer::begin() {
         sharedBroker->requestTracker[newRequest]++;
 
         //io_add_type(requestType, sharedBroker->requestTracker, sharedBroker->producedCounter);
-        printf("output: %d  %d\n", sharedBroker->requestTracker[0]+sharedBroker->requestTracker[1], sharedBroker->producedCounter[0] + sharedBroker->producedCounter[1]);
-        printf("%d\n", sharedBroker->requestQueue.size());
-        //printf("%s -- %d + %d = %d -- %d + %d = %d\n", requestType, sharedBroker->requestTracker[0], sharedBroker->requestTracker[1], sharedBroker->requestTracker[0]+sharedBroker->requestTracker[1], sharedBroker->producedCounter[0], sharedBroker->producedCounter[1], sharedBroker->producedCounter[0]+sharedBroker->producedCounter[1]);
 
         sem_post(&sharedBroker->mutex);
 

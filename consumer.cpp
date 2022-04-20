@@ -1,20 +1,16 @@
 #include "consumer.h"
 
-consumer::consumer(broker* thisBroker, unsigned int wait, ConsumerType consumerType) {
-    waitTime = wait;
-    sharedBroker = thisBroker;
-    this->consumerType = consumerType;
+consumer::consumer(cthread_info* cInfo) {
+    waitTime = cInfo->waitTime;
+    sharedBroker = cInfo->sharedBroker;
+    this->consumerType = cInfo->consumerType;
     SleepTime.tv_sec = (long)waitTime / MSPERSEC;
     SleepTime.tv_nsec = (long)(waitTime % MSPERSEC) * NSPERMS;
 }
 
 void consumer::begin() {
     RequestType requestType;
-    cout << sharedBroker->consumedCounter[0][0]+sharedBroker->consumedCounter[1][0]+sharedBroker->consumedCounter[0][1]+sharedBroker->consumedCounter[1][1] << endl;
     while (!sharedBroker->maxReached || !sharedBroker->requestQueue.empty()) {
-        int value;
-        sem_getvalue(&sharedBroker->unconsumed, &value);
-        printf("%d %d %d %s\n", value, sharedBroker->consumedCounter[0][0]+sharedBroker->consumedCounter[1][0]+sharedBroker->consumedCounter[0][1]+sharedBroker->consumedCounter[1][1],sharedBroker->requestTracker[0]+sharedBroker->requestTracker[1] , sharedBroker->requestQueue.empty() ? "true" : "false");
         sem_wait(&sharedBroker->unconsumed);
 
         errno = 0;
@@ -41,8 +37,6 @@ void consumer::begin() {
         sharedBroker->consumedCounter[consumerType][requestType]++;
 
         //io_remove_type(consumerType, requestType, sharedBroker->requestTracker, sharedBroker->consumedCounter[consumerType]);
-        //printf("consume %d %s\n", sharedBroker->consumedCounter[0][0]+sharedBroker->consumedCounter[1][0]+sharedBroker->consumedCounter[0][1]+sharedBroker->consumedCounter[1][1], sharedBroker->requestQueue.empty() ? "true" : "false");
-        //printf("%s by %s -- %d + %d = %d -- %d + %d = %d\n", consumerType, requestType, sharedBroker->requestTracker[0], sharedBroker->requestTracker[1], sharedBroker->requestTracker[0]+sharedBroker->requestTracker[1], sharedBroker->consumedCounter[consumerType][0], sharedBroker->consumedCounter[consumerType][1], sharedBroker->consumedCounter[consumerType][0]+sharedBroker->consumedCounter[consumerType][1]);
 
         sem_post(&sharedBroker->mutex);
         sem_post(&sharedBroker->availableSlots);

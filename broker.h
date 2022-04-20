@@ -21,11 +21,10 @@ using namespace std;
 
 class broker {
 public:
-    broker(unsigned int maxR, unsigned int wait[4]);
+    broker(unsigned int maxR);
     unsigned int maxRequests;
     queue<RequestType> requestQueue;
     int currThreads = 0;
-    unsigned int* waitTimes;
     sem_t mutex{};
     sem_t availableSlots{};
     sem_t unconsumed{};
@@ -38,6 +37,19 @@ public:
 //    int (*)[2] consumedCounter;
     bool maxReached = false;
     sem_t allConsumed{};
+};
+
+struct pthread_info {
+    pthread_info(broker* sharedBroker, unsigned int waitTime, RequestType requestType);
+    broker* sharedBroker{};
+    unsigned int waitTime;
+    RequestType requestType;
+};
+struct cthread_info {
+    cthread_info(broker* sharedBroker, unsigned int waitTime, ConsumerType consumerType);
+    broker* sharedBroker{};
+    unsigned int waitTime;
+    ConsumerType consumerType;
 };
 
 
