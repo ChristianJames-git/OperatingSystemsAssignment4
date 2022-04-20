@@ -1,28 +1,29 @@
 #include <getopt.h>
-#include "broker.h"
+#include "producer.h"
+#include "consumer.h"
 #include <pthread.h>
-
-#define REQUESTSDEFAULT 120
-#define MAXQUEUE 12
-#define MAXHUMANDRIVER 4
 
 #define CCOSTSAVING 0
 #define CFASTMATCHING 1
 #define PHUMAN 2
 #define PAUTONOMOUS 3
 
-extern "C" void * cThread( void * VoidPtr )
+extern "C" void * cThread( void * sharedBroker )
 {
-//    auto *popTree = new populatetree();
-//    popTree->threadMain(VoidPtr); //calls populatetree thread controller
-//    pthread_exit(popTree);
-//    return nullptr;
-    auto* producerController = new producer();
+    auto* tempBroker = static_cast<broker *>(sharedBroker);
+    auto* producerController = new producer(tempBroker, tempBroker->waitTimes[tempBroker->currThreads]);
+
+    pthread_exit(tempBroker);
+    return nullptr;
 }
 
-extern "C" void * pThread( void * VoidPtr )
+extern "C" void * pThread( void * sharedBroker )
 {
-    auto* consumeController = new consumer();
+    auto* tempBroker = static_cast<broker *>(sharedBroker);
+    auto* consumeController = new consumer(tempBroker, tempBroker->waitTimes[tempBroker->currThreads]);
+
+    pthread_exit(tempBroker);
+    return nullptr;
 }
 
 int main(int argc, char **argv) {
@@ -56,12 +57,12 @@ int main(int argc, char **argv) {
         }
     }
 
-    auto* mainBroker = new broker(totalRequests);
+    auto* sharedBroker = new broker(totalRequests, waitTimes);
 
     pthread_t cCostSavingThread, cFastMatchingThread, pHumanThread, pAutoThread;
 
-    pthread_create(&pHumanThread, nullptr, &pThread, mainBroker); //create producer thread 1
-    pthread_create(&pAutoThread, nullptr, &pThread, mainBroker); //create producer thread 2
-    pthread_create(&cCostSavingThread, nullptr, &cThread, mainBroker); //create customer thread 1
-    pthread_create(&cFastMatchingThread, nullptr, &cThread, mainBroker); //create customer thread 2
+    pthread_create(&pHumanThread, nullptr, &pThread, sharedBroker); //create producer thread 1
+    pthread_create(&pAutoThread, nullptr, &pThread, sharedBroker); //create producer thread 2
+    pthread_create(&cCostSavingThread, nullptr, &cThread, sharedBroker); //create customer thread 1
+    pthread_create(&cFastMatchingThread, nullptr, &cThread, sharedBroker); //create customer thread 2
 }

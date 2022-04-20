@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <time.h>
-
 #include "io.h"
 
 /*
@@ -12,9 +11,7 @@
  * C++ usually uses this #define to declare the C++ standard.
  * It will not be defined if a C compiler is used.
  */
-#ifdef __cplusplus
 using namespace std;
-#endif
 
 /*
  * Data section - names must align with the enumerated types

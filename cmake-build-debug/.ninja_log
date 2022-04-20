@@ -1,0 +1,18 @@
+# ninja log v5
+20	746	6721179680971985	CMakeFiles/OperatingSystemsAssignment4.dir/producer.cpp.obj	e23133a5ff54c44c
+23	747	6721179680971985	CMakeFiles/OperatingSystemsAssignment4.dir/consumer.cpp.obj	eed972f36838780f
+0	748	6721179680991936	CMakeFiles/OperatingSystemsAssignment4.dir/main.cpp.obj	3e9c80a9fa5b6b5f
+16	748	6721179680991936	CMakeFiles/OperatingSystemsAssignment4.dir/broker.cpp.obj	c629eded96e6cb42
+748	1063	6721179684137684	OperatingSystemsAssignment4.exe	18d6dc691d3835ba
+19	319	6721181209256412	CMakeFiles/OperatingSystemsAssignment4.dir/producer.cpp.obj	e23133a5ff54c44c
+15	329	6721181209356145	CMakeFiles/OperatingSystemsAssignment4.dir/broker.cpp.obj	c629eded96e6cb42
+22	330	6721181209366104	CMakeFiles/OperatingSystemsAssignment4.dir/consumer.cpp.obj	eed972f36838780f
+2	336	6721181209445889	CMakeFiles/OperatingSystemsAssignment4.dir/main.cpp.obj	3e9c80a9fa5b6b5f
+337	472	6721181210772345	OperatingSystemsAssignment4.exe	18d6dc691d3835ba
+18	303	6721181916354028	CMakeFiles/OperatingSystemsAssignment4.dir/consumer.cpp.obj	eed972f36838780f
+2	319	6721181916523567	CMakeFiles/OperatingSystemsAssignment4.dir/main.cpp.obj	3e9c80a9fa5b6b5f
+21	320	6721181916533535	CMakeFiles/OperatingSystemsAssignment4.dir/producer.cpp.obj	e23133a5ff54c44c
+14	337	6721181916713055	CMakeFiles/OperatingSystemsAssignment4.dir/broker.cpp.obj	c629eded96e6cb42
+337	471	6721181918009973	OperatingSystemsAssignment4.exe	18d6dc691d3835ba
+2	303	6721182213139745	CMakeFiles/OperatingSystemsAssignment4.dir/main.cpp.obj	3e9c80a9fa5b6b5f
+303	435	6721182214436000	OperatingSystemsAssignment4.exe	18d6dc691d3835ba
