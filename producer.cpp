@@ -30,16 +30,19 @@ void producer::begin() {
                     exit(EXIT_FAILURE);
             }
         }
-        if (sharedBroker->producedCounter[0] + sharedBroker->producedCounter[1] >= sharedBroker->maxRequests)
-            break;
         sem_wait(&sharedBroker->mutex);
+        if (sharedBroker->producedCounter[0] + sharedBroker->producedCounter[1] >= sharedBroker->maxRequests) {
+            sem_post(&sharedBroker->mutex);
+            sem_post(&sharedBroker->availableSlots);
+            break;
+        }
 
         sharedBroker->requestQueue.push(newRequest);
 
         sharedBroker->producedCounter[newRequest]++;
         sharedBroker->requestTracker[newRequest]++;
 
-        //io_add_type(requestType, sharedBroker->requestTracker, sharedBroker->producedCounter);
+        io_add_type(requestType, sharedBroker->requestTracker, sharedBroker->producedCounter);
 
         sem_post(&sharedBroker->mutex);
 

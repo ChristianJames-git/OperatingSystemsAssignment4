@@ -73,7 +73,9 @@ int main(int argc, char **argv) {
     pthread_create(&cFastMatchingThread, nullptr, &cThread, cfast); //create customer thread 2
 
     sem_wait(&sharedBroker->allConsumed);
+    //cout << "COMPELTE" << endl;
+    int* a[2] = {sharedBroker->consumedCounter[0], sharedBroker->consumedCounter[1] };
 
-    //io_production_report(sharedBroker->producedCounter, sharedBroker->consumedCounter);
-    printf("Human: %d ; Robot: %d ; CostAlgo: %d + %d = %d ; FastAlgo: %d + %d = %d\n", sharedBroker->producedCounter[0], sharedBroker->producedCounter[1], sharedBroker->consumedCounter[0][0], sharedBroker->consumedCounter[0][1], sharedBroker->consumedCounter[0][0]+sharedBroker->consumedCounter[0][1], sharedBroker->consumedCounter[1][0], sharedBroker->consumedCounter[1][1], sharedBroker->consumedCounter[1][0]+sharedBroker->consumedCounter[1][1]);
+    io_production_report(sharedBroker->producedCounter, a);
+    //printf("Human: %d ; Robot: %d ; CostAlgo: %d + %d = %d ; FastAlgo: %d + %d = %d\n", sharedBroker->producedCounter[0], sharedBroker->producedCounter[1], sharedBroker->consumedCounter[0][0], sharedBroker->consumedCounter[0][1], sharedBroker->consumedCounter[0][0]+sharedBroker->consumedCounter[0][1], sharedBroker->consumedCounter[1][0], sharedBroker->consumedCounter[1][1], sharedBroker->consumedCounter[1][0]+sharedBroker->consumedCounter[1][1]);
 }

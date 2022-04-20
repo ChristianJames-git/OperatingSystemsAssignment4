@@ -11,8 +11,6 @@ consumer::consumer(cthread_info* cInfo) {
 void consumer::begin() {
     RequestType requestType;
     while (!sharedBroker->maxReached || !sharedBroker->requestQueue.empty()) {
-        sem_wait(&sharedBroker->unconsumed);
-
         errno = 0;
         if (nanosleep(&SleepTime, nullptr) == -1) {
             switch (errno) {
@@ -27,6 +25,7 @@ void consumer::begin() {
                     exit(EXIT_FAILURE);
             }
         }
+        sem_wait(&sharedBroker->unconsumed);
         sem_wait(&sharedBroker->mutex);
 
         requestType = sharedBroker->requestQueue.front();
@@ -36,7 +35,7 @@ void consumer::begin() {
         sharedBroker->requestTracker[requestType]--;
         sharedBroker->consumedCounter[consumerType][requestType]++;
 
-        //io_remove_type(consumerType, requestType, sharedBroker->requestTracker, sharedBroker->consumedCounter[consumerType]);
+        io_remove_type(consumerType, requestType, sharedBroker->requestTracker, sharedBroker->consumedCounter[consumerType]);
 
         sem_post(&sharedBroker->mutex);
         sem_post(&sharedBroker->availableSlots);

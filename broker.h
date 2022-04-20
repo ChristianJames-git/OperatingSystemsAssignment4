@@ -24,7 +24,6 @@ public:
     broker(unsigned int maxR);
     unsigned int maxRequests;
     queue<RequestType> requestQueue;
-    int currThreads = 0;
     sem_t mutex{};
     sem_t availableSlots{};
     sem_t unconsumed{};
@@ -32,9 +31,6 @@ public:
     int requestTracker[2]{};
     int producedCounter[2]{};
     int consumedCounter[2][2]{};
-//    int* requestTracker;
-//    int* producedCounter;
-//    int (*)[2] consumedCounter;
     bool maxReached = false;
     sem_t allConsumed{};
 };
