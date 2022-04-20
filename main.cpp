@@ -8,19 +8,27 @@
 #define PHUMAN 2
 #define PAUTONOMOUS 3
 
-extern "C" void * cThread( void * sharedBroker )
+extern "C" void * pThread( void * sharedBroker )
 {
     auto* tempBroker = static_cast<broker *>(sharedBroker);
-    auto* producerController = new producer(tempBroker, tempBroker->waitTimes[tempBroker->currThreads]);
+    auto* producerController = new producer(tempBroker, tempBroker->waitTimes[tempBroker->currThreads], tempBroker->currThreads++ == PHUMAN ? HumanDriver : RoboDriver);
+
+    producerController->begin();
+
+    cout << "pthread" << endl;
 
     pthread_exit(tempBroker);
     return nullptr;
 }
 
-extern "C" void * pThread( void * sharedBroker )
+extern "C" void * cThread( void * sharedBroker )
 {
     auto* tempBroker = static_cast<broker *>(sharedBroker);
-    auto* consumeController = new consumer(tempBroker, tempBroker->waitTimes[tempBroker->currThreads]);
+    auto* consumerController = new consumer(tempBroker, tempBroker->waitTimes[tempBroker->currThreads], tempBroker->currThreads++ == CCOSTSAVING ? CostAlgoDispatch : FastAlgoDispatch);
+
+    consumerController->begin();
+
+    cout << "cthread" << endl;
 
     pthread_exit(tempBroker);
     return nullptr;
@@ -59,10 +67,16 @@ int main(int argc, char **argv) {
 
     auto* sharedBroker = new broker(totalRequests, waitTimes);
 
-    pthread_t cCostSavingThread, cFastMatchingThread, pHumanThread, pAutoThread;
+    pthread_t pHumanThread, pAutoThread, cCostSavingThread, cFastMatchingThread;
 
     pthread_create(&pHumanThread, nullptr, &pThread, sharedBroker); //create producer thread 1
     pthread_create(&pAutoThread, nullptr, &pThread, sharedBroker); //create producer thread 2
     pthread_create(&cCostSavingThread, nullptr, &cThread, sharedBroker); //create customer thread 1
     pthread_create(&cFastMatchingThread, nullptr, &cThread, sharedBroker); //create customer thread 2
+
+    sem_wait(&sharedBroker->allConsumed);
+
+    //io_production_report(sharedBroker->producedCounter, sharedBroker->consumedCounter);
+    printf("input");
+    //printf("Human: %d ; Robot: %d ; CostAlgo: %d + %d = %d ; FastAlgo: %d + %d = %d\n", sharedBroker->producedCounter[0], sharedBroker->producedCounter[1], sharedBroker->consumedCounter[0][0], sharedBroker->consumedCounter[0][1], sharedBroker->consumedCounter[0][0]+sharedBroker->consumedCounter[0][1], sharedBroker->consumedCounter[1][0], sharedBroker->consumedCounter[1][1], sharedBroker->consumedCounter[1][0]+sharedBroker->consumedCounter[1][1]);
 }

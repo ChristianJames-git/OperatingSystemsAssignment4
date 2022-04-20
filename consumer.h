@@ -6,8 +6,13 @@
 
 class consumer {
 public:
-    consumer(broker* thisBroker, unsigned int wait);
+    consumer(broker* thisBroker, unsigned int wait, ConsumerType consumerType);
+    void begin();
     unsigned int waitTime;
+private:
+    broker* sharedBroker;
+    ConsumerType consumerType;
+    struct timespec	SleepTime{};
 };
 
 

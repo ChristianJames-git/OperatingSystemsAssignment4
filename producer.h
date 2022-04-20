@@ -5,8 +5,13 @@
 
 class producer {
 public:
-    producer(broker* thisBroker, unsigned int wait);
+    producer(broker* thisBroker, unsigned int wait, RequestType requestType);
+    void begin();
     unsigned int waitTime;
+private:
+    broker* sharedBroker;
+    RequestType requestType;
+    struct timespec	SleepTime{};
 };
 
 #endif
