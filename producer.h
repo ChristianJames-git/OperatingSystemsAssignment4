@@ -1,3 +1,8 @@
+/*
+ * Christian James
+ * 823672623
+ */
+
 #include "broker.h"
 
 #ifndef OPERATINGSYSTEMSASSIGNMENT4_PRODUCER_H

@@ -1,5 +1,14 @@
+/*
+ * Christian James
+ * 823672623
+ */
+
 #include "consumer.h"
 
+/*
+ * Store information from cthread_info
+ * Set Sleep time necessary for nanosleep
+ */
 consumer::consumer(cthread_info* cInfo) {
     waitTime = cInfo->waitTime;
     sharedBroker = cInfo->sharedBroker;
@@ -8,9 +17,15 @@ consumer::consumer(cthread_info* cInfo) {
     SleepTime.tv_nsec = (long)(waitTime % MSPERSEC) * NSPERMS;
 }
 
+/*
+ * Consumer thread method
+ * Loop until last request consumed, then exit
+ */
 void consumer::begin() {
     RequestType requestType;
-    while (!sharedBroker->maxReached || !sharedBroker->requestQueue.empty()) {
+    while (!sharedBroker->maxReached || !sharedBroker->requestQueue.empty()) { //loop until producers finish and all requests are consumed
+
+        //Sleep and error checking
         errno = 0;
         if (nanosleep(&SleepTime, nullptr) == -1) {
             switch (errno) {
@@ -25,20 +40,21 @@ void consumer::begin() {
                     exit(EXIT_FAILURE);
             }
         }
-        sem_wait(&sharedBroker->unconsumed);
-        sem_wait(&sharedBroker->mutex);
 
-        requestType = sharedBroker->requestQueue.front();
-        sharedBroker->requestQueue.pop();
-        if (requestType == HumanDriver)
-            sem_post(&sharedBroker->availableHumanSlots);
-        sharedBroker->requestTracker[requestType]--;
-        sharedBroker->consumedCounter[consumerType][requestType]++;
+        sem_wait(&sharedBroker->unconsumed); //Consume
+        sem_wait(&sharedBroker->mutex); //Lock queue
 
-        io_remove_type(consumerType, requestType, sharedBroker->requestTracker, sharedBroker->consumedCounter[consumerType]);
+        requestType = sharedBroker->requestQueue.front(); //Get front requestType
+        sharedBroker->requestQueue.pop(); //remove front
+        if (requestType == HumanDriver) //if requestType is Human
+            sem_post(&sharedBroker->availableHumanSlots); //track allowed Human Request to keep under 4
+        sharedBroker->requestTracker[requestType]--; //decrement request tracker
+        sharedBroker->consumedCounter[consumerType][requestType]++; //increment consumed counter
 
-        sem_post(&sharedBroker->mutex);
-        sem_post(&sharedBroker->availableSlots);
+        io_remove_type(consumerType, requestType, sharedBroker->requestTracker, sharedBroker->consumedCounter[consumerType]); //output
+
+        sem_post(&sharedBroker->mutex); //release queue
+        sem_post(&sharedBroker->availableSlots); //release slot
     }
-    sem_post(&sharedBroker->allConsumed);
+    sem_post(&sharedBroker->allConsumed); //signal main to stop waiting
 }

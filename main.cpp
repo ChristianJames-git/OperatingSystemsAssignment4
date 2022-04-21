@@ -1,3 +1,8 @@
+/*
+ * Christian James
+ * 823672623
+ */
+
 #include <getopt.h>
 #include "producer.h"
 #include "consumer.h"
@@ -8,6 +13,13 @@
 #define CCOSTSAVING 2
 #define CFASTMATCHING 3
 
+/*
+ * pThread(void* pInfo)
+ * passes info to new producer thread controller and calls begin() method
+ *
+ * Expects:
+ *     pInfo: unique information for specific thread
+ */
 extern "C" void * pThread( void * pInfo )
 {
     auto* producerController = new producer((pthread_info *)pInfo);
@@ -18,6 +30,13 @@ extern "C" void * pThread( void * pInfo )
     return nullptr;
 }
 
+/*
+ * cThread(void* cInfo)
+ * passes info to new consumer thread controller and calls begin() method
+ *
+ * Expects:
+ *     cInfo: unique information for specific thread
+ */
 extern "C" void * cThread( void * cInfo )
 {
     auto* consumerController = new consumer((cthread_info *)cInfo);
@@ -40,26 +59,28 @@ int main(int argc, char **argv) {
                 break;
             case 'c':
                 if (optarg)
-                    waitTimes[CCOSTSAVING] = stoi(optarg);
+                    waitTimes[CCOSTSAVING] = stoi(optarg); //store c
                 break;
             case 'f':
                 if (optarg)
-                    waitTimes[CFASTMATCHING] = stoi(optarg);
+                    waitTimes[CFASTMATCHING] = stoi(optarg); //store f
                 break;
             case 'h':
                 if (optarg)
-                    waitTimes[PHUMAN] = stoi(optarg);
+                    waitTimes[PHUMAN] = stoi(optarg); //store h
                 break;
             case 'a':
                 if (optarg)
-                    waitTimes[PAUTONOMOUS] = stoi(optarg);
+                    waitTimes[PAUTONOMOUS] = stoi(optarg); //store a
                 break;
             default:
                 break;
         }
     }
 
+    //Create shared broker
     auto* sharedBroker = new broker(totalRequests);
+    //Create unique information containers
     auto* phuman = new pthread_info(sharedBroker, waitTimes[PHUMAN], HumanDriver);
     auto* pauto = new pthread_info(sharedBroker, waitTimes[PAUTONOMOUS], RoboDriver);
     auto* ccost = new cthread_info(sharedBroker, waitTimes[CCOSTSAVING], CostAlgoDispatch);
@@ -72,10 +93,8 @@ int main(int argc, char **argv) {
     pthread_create(&cCostSavingThread, nullptr, &cThread, ccost); //create customer thread 1
     pthread_create(&cFastMatchingThread, nullptr, &cThread, cfast); //create customer thread 2
 
-    sem_wait(&sharedBroker->allConsumed);
-    //cout << "COMPELTE" << endl;
-    int* a[2] = {sharedBroker->consumedCounter[0], sharedBroker->consumedCounter[1] };
+    sem_wait(&sharedBroker->allConsumed); //wait until consumer thread signals completion
+    int* a[2] = {sharedBroker->consumedCounter[0], sharedBroker->consumedCounter[1] }; //format output as needed for io
 
-    io_production_report(sharedBroker->producedCounter, a);
-    //printf("Human: %d ; Robot: %d ; CostAlgo: %d + %d = %d ; FastAlgo: %d + %d = %d\n", sharedBroker->producedCounter[0], sharedBroker->producedCounter[1], sharedBroker->consumedCounter[0][0], sharedBroker->consumedCounter[0][1], sharedBroker->consumedCounter[0][0]+sharedBroker->consumedCounter[0][1], sharedBroker->consumedCounter[1][0], sharedBroker->consumedCounter[1][1], sharedBroker->consumedCounter[1][0]+sharedBroker->consumedCounter[1][1]);
+    io_production_report(sharedBroker->producedCounter, a); //output
 }

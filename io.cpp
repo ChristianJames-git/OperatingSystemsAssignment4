@@ -1,3 +1,8 @@
+/*
+ * Christian James
+ * 823672623
+ */
+
 #include <stdio.h>
 #include <time.h>
 #include "io.h"
